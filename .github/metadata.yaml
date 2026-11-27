@@ -1,0 +1,10 @@
+description: "W3C WGSL for Swift: WebGPU's shading language as values, and their text."
+topics:
+  - standards
+  - w3c
+  - wgsl
+  - webgpu
+  - shading-language
+homepage: "https://swift-institute.org"
+readme:
+  family: E
