@@ -54,6 +54,8 @@ extension `WGSL Tests` {
         func `A negative integer is an operand in parentheses, and the least one is written by conversion`() {
             #expect(W3C.WGSL.Expression.unary(.minus, .i32(-3)).description == "-(-3i)")
             #expect(W3C.WGSL.Expression.i32(.min).description == "i32(-2147483648)")
+            #expect(W3C.WGSL.Expression.call("atomicLoad", [.unary(.address, .element(.name("heap"), .u32(0)))]).description == "atomicLoad(&heap[0u])")
+            #expect(W3C.WGSL.Kind.array(.atomic(.u32), nil).description == "array<atomic<u32>>")
         }
 
         @Test

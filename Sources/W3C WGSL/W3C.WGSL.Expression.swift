@@ -26,6 +26,8 @@ extension W3C.WGSL.Expression {
         case minus = "-"
         case complement = "~"
         case not = "!"
+        /// The reference to a place, as an atomic operation takes it.
+        case address = "&"
     }
 
     /// An infix operator, by its spelling.
