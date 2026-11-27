@@ -31,7 +31,7 @@ extension `WGSL Tests` {
 
                     var<private> stack: array<u32, 4>;
 
-                    const one: f32 = bitcast<f32>(1065353216u);
+                    const one: f32 = 0x1.0p0f;
 
                     @compute @workgroup_size(16, 16, 1)
                     fn run(@builtin(global_invocation_id) id: vec3<u32>) {
@@ -54,6 +54,16 @@ extension `WGSL Tests` {
         func `A negative integer is an operand in parentheses, and the least one is written by conversion`() {
             #expect(W3C.WGSL.Expression.unary(.minus, .i32(-3)).description == "-(-3i)")
             #expect(W3C.WGSL.Expression.i32(.min).description == "i32(-2147483648)")
+        }
+
+        @Test
+        func `An f32 is written exactly in hexadecimal, and one without a literal as a bit cast`() {
+            func text(_ value: Float) -> String { W3C.WGSL.Expression.f32(value.bitPattern).description }
+            #expect(text(12) == "0x1.8p3f")
+            #expect(text(-0.1) == "-0x1.99999ap-4f")
+            #expect(text(.leastNonzeroMagnitude) == "0x0.000002p-126f")
+            #expect(text(-Float.zero) == "-0.0f")
+            #expect(text(.infinity) == "bitcast<f32>(2139095040u)")
         }
     }
 }
