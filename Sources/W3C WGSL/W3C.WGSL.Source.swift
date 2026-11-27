@@ -42,7 +42,7 @@ extension W3C.WGSL.Source {
                 (binding.map { "@group(\($0.group)) @binding(\($0.binding)) " } ?? "") + "var" + (space.map { "<\($0)>" } ?? "") + " \(name): \(kind);"
             case .constant(let kind, let name, let value): "const \(name): \(kind) = \(value);"
             case .structure(let structure):
-                (["struct \(structure.name) {"] + structure.members.map { "    \($0.name): \($0.kind)," } + ["}"]).joined(separator: "\n")
+                (["struct \(structure.name) {"] + structure.members.map { "    " + ($0.attribute.map { "\($0) " } ?? "") + "\($0.name): \($0.kind)," } + ["}"]).joined(separator: "\n")
             case .function(let function):
                 ([function.head + " {"] + function.body.flatMap { $0.lines(1) } + ["}"]).joined(separator: "\n")
             }

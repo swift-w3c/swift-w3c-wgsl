@@ -9,6 +9,10 @@ extension W3C.WGSL {
         case structure(String)
         /// A texture of two dimensions that is only written, in a texel format such as `rgba8unorm`.
         case storageTexture(String)
+        /// A texture of two dimensions read as vectors of `f32`.
+        case texture
+        /// What reads a texture between its texels.
+        case sampler
         /// A scalar that atomic operations read and write.
         case atomic(Scalar)
     }
@@ -29,6 +33,8 @@ extension W3C.WGSL.Kind: CustomStringConvertible {
         case .array(let kind, let count): count.map { "array<\(kind), \($0)>" } ?? "array<\(kind)>"
         case .structure(let name): name
         case .storageTexture(let format): "texture_storage_2d<\(format), write>"
+        case .texture: "texture_2d<f32>"
+        case .sampler: "sampler"
         case .atomic(let scalar): "atomic<\(scalar.rawValue)>"
         }
     }

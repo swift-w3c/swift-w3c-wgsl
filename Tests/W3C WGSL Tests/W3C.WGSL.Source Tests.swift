@@ -67,5 +67,58 @@ extension `WGSL Tests` {
             #expect(text(-Float.zero) == "-0.0f")
             #expect(text(.infinity) == "bitcast<f32>(2139095040u)")
         }
+
+        @Test
+        func `A vertex and a fragment stage are written with their places, built-ins, textures and sampler`() {
+            let handed = W3C.WGSL.Structure(
+                name: "Handed",
+                members: [.init(.vector(.f32, 4), "position", at: .builtin(.position)), .init(.u32, "shape", at: .location(0, flat: true))]
+            )
+            let corner = W3C.WGSL.Function(
+                stage: .vertex,
+                result: .structure("Handed"),
+                name: "corner",
+                parameters: [.init(.u32, "vertex", .vertexIndex), .init(.u32, "instance", .instanceIndex)],
+                body: [.return(nil)]
+            )
+            let pixel = W3C.WGSL.Function(
+                stage: .fragment,
+                result: .vector(.f32, 4),
+                given: .location(0),
+                name: "pixel",
+                parameters: [.init(.vector(.f32, 4), "at", .position), .init(.u32, "shape", at: .location(0, flat: true))],
+                body: [.return(.call("textureSampleLevel", [.name("sheet"), .name("between"), .member(.name("at"), "xy"), .f32(0)]))]
+            )
+            let source = W3C.WGSL.Source([
+                .variable(nil, .texture, "sheet", binding: .init(group: 1, binding: 0)),
+                .variable(nil, .sampler, "between", binding: .init(group: 0, binding: 3)),
+                .structure(handed),
+                .function(corner),
+                .function(pixel),
+            ])
+            #expect(
+                source.text == """
+                    @group(1) @binding(0) var sheet: texture_2d<f32>;
+
+                    @group(0) @binding(3) var between: sampler;
+
+                    struct Handed {
+                        @builtin(position) position: vec4<f32>,
+                        @location(0) @interpolate(flat) shape: u32,
+                    }
+
+                    @vertex
+                    fn corner(@builtin(vertex_index) vertex: u32, @builtin(instance_index) instance: u32) -> Handed {
+                        return;
+                    }
+
+                    @fragment
+                    fn pixel(@builtin(position) at: vec4<f32>, @location(0) @interpolate(flat) shape: u32) -> @location(0) vec4<f32> {
+                        return textureSampleLevel(sheet, between, at.xy, 0.0f);
+                    }
+
+                    """
+            )
+        }
     }
 }
